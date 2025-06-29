@@ -1,0 +1,9 @@
+apiVersion: v2
+name: chatbot-app-chart
+description: A Helm chart for deploying the Gradio chatbot application on OpenShift.
+
+# A chart version, following SemVer 2.0.0
+version: 0.1.0
+
+# The version of the application that this chart helps deploy.
+appVersion: "1.0.0"

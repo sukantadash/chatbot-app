@@ -1,0 +1,23 @@
+# chatbot-app-chart/templates/route.yaml
+{{- if .Values.route.enabled -}}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "chatbot-app-chart.fullname" . }}
+  labels:
+    {{- include "chatbot-app-chart.labels" . | nindent 4 }}
+spec:
+  to:
+    kind: Service
+    name: {{ include "chatbot-app-chart.fullname" . }}
+    weight: 100
+  port:
+    targetPort: http
+  {{- if .Values.route.host }}
+  host: {{ .Values.route.host | quote }}
+  {{- end }}
+  tls:
+    termination: {{ .Values.route.tlsTermination }}
+    insecureEdgeTerminationPolicy: {{ .Values.route.insecureEdgeTerminationPolicy }}
+  wildcardPolicy: None
+{{- end -}}

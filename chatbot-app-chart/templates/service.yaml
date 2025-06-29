@@ -1,0 +1,16 @@
+# chatbot-app-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "chatbot-app-chart.fullname" . }}
+  labels:
+    {{- include "chatbot-app-chart.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: {{ include "chatbot-app-chart.fullname" . }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      name: http
+  type: {{ .Values.service.type }}

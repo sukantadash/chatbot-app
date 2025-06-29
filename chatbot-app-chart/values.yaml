@@ -1,0 +1,49 @@
+# chatbot-app-chart/values.yaml
+
+# Image configuration for the chatbot application
+image:
+  # Replace with your OpenShift internal registry path, e.g., 'image-registry.openshift-image-registry.svc:5000/your-project-name/chatbot-app'
+  # The 'your-project-name' part will be dynamically replaced by {{ .Release.Namespace }} in the template.
+  repository: "image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/chatbot-app"
+  tag: "latest" # or specify a specific image tag
+
+# Number of replicas for the chatbot application pods
+replicaCount: 1
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80       # Service port
+  targetPort: 7860 # Container port (Gradio's default)
+
+# Route configuration for external access
+route:
+  enabled: true       # Set to false to disable route creation
+  host: ""            # Specify a hostname, e.g., "chatbot.apps.your-cluster.com". If empty, OpenShift generates one.
+  tlsTermination: "edge"
+  insecureEdgeTerminationPolicy: "Redirect"
+
+# LLM API configuration (Environment variables for the container)
+llm:
+  # Replace with your OpenShift vLLM API endpoint
+  apiUrl: "YOUR_OPENSHIFT_VLLM_API_ENDPOINT"
+  # Replace with your actual model name deployed on vLLM
+  modelName: "YOUR_MODEL_NAME_ON_VLLM"
+  # Your API Key for the vLLM. This value will be base64 encoded and stored in a Secret.
+  # Leave empty ("") if your vLLM deployment does not require an API key.
+  apiKey: "YOUR_API_KEY_IF_REQUIRED"
+
+# Resource requests and limits for the application pods
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "1"
+
+# Labels to apply to all resources created by this chart
+commonLabels:
+  app.kubernetes.io/name: chatbot-app
+  app.kubernetes.io/instance: {{ .Release.Name }}
+  app.kubernetes.io/managed-by: {{ .Release.Service }}

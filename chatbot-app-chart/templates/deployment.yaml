@@ -1,0 +1,41 @@
+# chatbot-app-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chatbot-app-chart.fullname" . }}
+  labels:
+    {{- include "chatbot-app-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: # Selector for Deployment uses matchLabels
+      app: {{ include "chatbot-app-chart.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "chatbot-app-chart.fullname" . }}
+    spec:
+      containers:
+        - name: {{ include "chatbot-app-chart.fullname" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: VLLM_API_URL
+              value: {{ .Values.llm.apiUrl | quote }}
+            - name: VLLM_MODEL_NAME
+              value: {{ .Values.llm.modelName | quote }}
+            - name: VLLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "chatbot-app-chart.fullname" . }}-secret
+                  key: VLLM_API_KEY
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      restartPolicy: Always
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
