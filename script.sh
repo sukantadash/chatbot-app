@@ -8,7 +8,7 @@ curl -X 'POST' \
     'https://llama-3-2-3b-maas-apicast-production.apps.prod.rhoai.rh-aiservices-bu.com:443/v1/completions' \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
-    -H 'Authorization: Bearer 10e61d1b36110a03cf76b01ed69f3870' \
+    -H 'Authorization: Bearer ' \
     -d '{
     "model": "llama-3-2-3b",
     "prompt": "San Francisco is a",
@@ -20,4 +20,4 @@ curl -X 'POST' \
 curl -X 'GET' \
   'https://granite-33-2b-instruct1-maas-apicast-production.apps.cluster-2j5v9.2j5v9.sandbox3159.opentlc.com:443/v1/models' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer 0e156b47d242d333849b41a4ecf803f6'
+  -H 'Authorization: Bearer '
