@@ -1,10 +1,10 @@
 # chatbot-app-chart/values.yaml
-
+name: chatbot
+imagePullSecret: "artifactory-secret"
 # Image configuration for the chatbot application
 image:
-  # Replace with your OpenShift internal registry path, e.g., 'image-registry.openshift-image-registry.svc:5000/your-project-name/chatbot-app'
-  # The 'your-project-name' part will be dynamically replaced by {{ .Release.Namespace }} in the template.
-  repository: "image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/chatbot-app"
+  # Replace with your artifactory registry path, e.g., 'your-artifactory.com/your-project-name/chatbot-app'
+  repository: "your-artifactory.com/your-project-name/chatbot-app"
   tag: "latest" # or specify a specific image tag
 
 # Number of replicas for the chatbot application pods
@@ -43,7 +43,4 @@ resources:
     cpu: "1"
 
 # Labels to apply to all resources created by this chart
-commonLabels:
-  app.kubernetes.io/name: chatbot-app
-  app.kubernetes.io/instance: {{ .Release.Name }}
-  app.kubernetes.io/managed-by: {{ .Release.Service }}
+commonLabels: {}

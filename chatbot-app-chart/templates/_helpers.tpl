@@ -2,7 +2,7 @@
 Expand the name of the chart.
 */}}
 {{- define "chatbot-app-chart.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default .Values.name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -29,7 +29,7 @@ Common labels
 {{- define "chatbot-app-chart.labels" -}}
 app.kubernetes.io/name: {{ include "chatbot-app-chart.name" . }}
 helm.sh/chart: {{ include "chatbot-app-chart.chart" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ include "chatbot-app-chart.name" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}

@@ -15,6 +15,8 @@ spec:
       labels:
         app: {{ include "chatbot-app-chart.fullname" . }}
     spec:
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecret }}
       containers:
         - name: {{ include "chatbot-app-chart.fullname" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
