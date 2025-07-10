@@ -1,0 +1,118 @@
+---
+# Source: chatbot-app-chart/templates/secret.yaml
+# chatbot-app-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: chatbot-secret
+  labels:
+    app.kubernetes.io/name: chatbot
+    helm.sh/chart: chatbot-app-chart-0.1.0
+    app.kubernetes.io/instance: chatbot
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+data:
+  # The VLLM_API_KEY value from values.yaml will be base64 encoded here.
+  # If apiKey in values.yaml is empty, this will result in an empty base64 string.
+  VLLM_API_KEY: "WU9VUl9BUElfS0VZX0lGX1JFUVVJUkVE"
+---
+# Source: chatbot-app-chart/templates/service.yaml
+# chatbot-app-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatbot
+  labels:
+    app.kubernetes.io/name: chatbot
+    helm.sh/chart: chatbot-app-chart-0.1.0
+    app.kubernetes.io/instance: chatbot
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    app: chatbot
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 7860
+      name: http
+  type: ClusterIP
+---
+# Source: chatbot-app-chart/templates/deployment.yaml
+# chatbot-app-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot
+  labels:
+    app.kubernetes.io/name: chatbot
+    helm.sh/chart: chatbot-app-chart-0.1.0
+    app.kubernetes.io/instance: chatbot
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # Selector for Deployment uses matchLabels
+      app: chatbot
+  template:
+    metadata:
+      labels:
+        app: chatbot
+    spec:
+      imagePullSecrets:
+        - name: artifactory-secret
+      containers:
+        - name: chatbot
+          image: "your-artifactory.com/your-project-name/chatbot-app:latest"
+          ports:
+            - containerPort: 7860
+              protocol: TCP
+          env:
+            - name: VLLM_API_URL
+              value: "YOUR_OPENSHIFT_VLLM_API_ENDPOINT"
+            - name: VLLM_MODEL_NAME
+              value: "YOUR_MODEL_NAME_ON_VLLM"
+            - name: VLLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: chatbot-secret
+                  key: VLLM_API_KEY
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+      restartPolicy: Always
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+---
+# Source: chatbot-app-chart/templates/route.yaml
+# chatbot-app-chart/templates/route.yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: chatbot
+  labels:
+    app.kubernetes.io/name: chatbot
+    helm.sh/chart: chatbot-app-chart-0.1.0
+    app.kubernetes.io/instance: chatbot
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  to:
+    kind: Service
+    name: chatbot
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
