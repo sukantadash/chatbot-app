@@ -6,15 +6,15 @@ FROM registry.access.redhat.com/ubi8/python-39
 
 # Set a working directory inside the container
 WORKDIR /app
-
+USER root
+# Create a non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
 # Copy the requirements file into the working directory
 COPY requirements.txt .
-
+COPY pip.conf /etc/pip.conf
 # Install Python dependencies
-# Using --no-cache-dir to avoid storing cache data in the image,
 # and --upgrade pip to ensure pip is up-to-date.
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all application source code into the working directory
 # This includes app.py, config.py, llm_service.py, and ui.py
@@ -23,9 +23,15 @@ COPY config.py .
 COPY llm_service.py .
 COPY ui.py .
 
+# Change ownership of the app directory to appuser
+RUN chown -R appuser:appuser /app /home/appuser
+
+# Switch to non-root user
+USER appuser
+
 # Expose the port Gradio runs on (default is 7860)
 EXPOSE 7860
 
 # Define the command to run the Gradio application
 # This will start the Gradio server when the container launches.
-CMD ["python", "app.py"]
+CMD ["uvicorn", "app:demo", "--host", "0.0.0.0", "--port", "7860"]
