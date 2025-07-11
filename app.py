@@ -49,24 +49,12 @@ if __name__ == "__main__":
 
     # Launch the Gradio application
     # Set server_name to "0.0.0.0" to bind to all interfaces
-    # Try without share first, fall back to share=True if localhost check fails
-    try:
-        demo.launch(
-            server_name="0.0.0.0",
-            server_port=7860,
-            share=False,
-            show_api=False,
-            prevent_thread_lock=True
-        )
-    except ValueError as e:
-        if "localhost is not accessible" in str(e):
-            print("Localhost not accessible, launching with share=True...")
-            demo.launch(
-                server_name="0.0.0.0",
-                server_port=7860,
-                share=True,
-                show_api=False,
-                prevent_thread_lock=True
-            )
-        else:
-            raise e
+    # Use inbrowser=False to prevent localhost accessibility check
+    demo.launch(
+        server_name="0.0.0.0",
+        server_port=7860,
+        share=False,
+        show_api=False,
+        prevent_thread_lock=True,
+        inbrowser=False  # Prevents localhost check by not trying to open browser
+    )
