@@ -14,7 +14,7 @@ replicaCount: 1
 service:
   type: ClusterIP
   port: 80       # Service port
-  targetPort: 7860 # Container port (Gradio's default)
+  targetPort: 8501 # Container port (Streamlit's default)
 
 # Route configuration for external access
 route:

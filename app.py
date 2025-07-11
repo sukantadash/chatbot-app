@@ -1,57 +1,55 @@
-# app.py - Main Application Entry Point
+# app.py - Streamlit Chatbot Application
 
-import gradio as gr
-import os
-from config import AppConfig
+import streamlit as st
 from llm_service import LLMService
-from ui import create_gradio_ui
+
+# --- App Title ---
+st.title("AI Chatbot")
 
 # --- Initialize LLM Service ---
 # This will also load environment variables from .env via AppConfig
+# and initialize the conversation chain.
 llm_service = LLMService()
 
-# --- Gradio UI Logic ---
-
-def respond_to_chat(message, history):
-    """
-    Main function to handle user messages in the chatbot UI.
-    Delegates the LLM interaction to LLMService.
-    `history` is Gradio's chat history: a list of dictionaries like
-    {"role": "user", "content": "hello"}
-    """
-    try:
-        # Get response from the LLM service
-        ai_response = llm_service.get_chat_response(message)
-
-        # Gradio's 'messages' type for chatbot expects dictionaries
-        new_history = history + [
-            {"role": "user", "content": message},
-            {"role": "assistant", "content": ai_response}
-        ]
-    except Exception as e:
-        new_history = history + [
-            {"role": "user", "content": message},
-            {"role": "assistant", "content": f"Error processing chat: {e}. Please check server logs."}
-        ]
-    return "", new_history # Clear input, return updated history
-
-
-# --- Create and Launch Gradio App ---
-if __name__ == "__main__":
-    # Get the initial greeting from the LLM service (which gets it from config)
+# --- Initialize Chat History in Session State ---
+# For more information on session state, see:
+# https://docs.streamlit.io/library/api-reference/session-state
+if "messages" not in st.session_state:
+    # Start with the initial greeting from the assistant
     initial_greeting = llm_service.get_initial_greeting()
+    st.session_state.messages = [{"role": "assistant", "content": initial_greeting}]
 
-    # Create the Gradio UI, passing only the required handler functions
-    demo = create_gradio_ui(
-        respond_to_chat_fn=respond_to_chat,
-        initial_greeting=initial_greeting
-    )
+# --- Display Prior Chat Messages ---
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-    # Launch the Gradio application.
-    # share=True is required for environments where localhost is not accessible.
-    # The frpc binary required for sharing is now included in the Containerfile.
-    demo.queue().launch(
-        server_name="0.0.0.0",
-        server_port=7861,
-        share=False
-    )
+# --- Handle User Input ---
+# The st.chat_input widget will automatically rerun the app on submission
+if prompt := st.chat_input("What would you like to talk about?"):
+    # 1. Add user message to chat history and display it
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # 2. Get AI response and display it
+    with st.chat_message("assistant"):
+        # Use a placeholder for the streaming effect
+        message_placeholder = st.empty()
+        full_response = ""
+        try:
+            # Get response from the LLM service
+            ai_response = llm_service.get_chat_response(prompt)
+            full_response = ai_response
+            message_placeholder.markdown(full_response)
+        except Exception as e:
+            full_response = f"Error processing chat: {e}. Please check server logs."
+            message_placeholder.markdown(full_response)
+    
+    # 3. Add AI response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+# To run this app:
+# 1. Make sure you have an active virtual environment.
+# 2. Ensure your .env file is correctly configured.
+# 3. Run `streamlit run app.py` in your terminal.

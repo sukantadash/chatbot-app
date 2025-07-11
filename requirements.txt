@@ -1,4 +1,4 @@
-gradio
+streamlit
 langchain-openai
 langchain-core
 langchain-community

@@ -17,11 +17,10 @@ COPY pip.conf /etc/pip.conf
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all application source code into the working directory
-# This includes app.py, config.py, llm_service.py, and ui.py
+# This includes app.py, config.py, and llm_service.py
 COPY app.py .
 COPY config.py .
 COPY llm_service.py .
-COPY ui.py .
 
 # Change ownership of the app directory to appuser
 RUN chown -R appuser:appuser /app /home/appuser
@@ -29,9 +28,9 @@ RUN chown -R appuser:appuser /app /home/appuser
 # Switch to non-root user
 USER appuser
 
-# Expose the port Gradio runs on (default is 7860)
-EXPOSE 7860
+# Expose the port Streamlit runs on (default is 8501)
+EXPOSE 8501
 
-# Define the command to run the Gradio application
-# This will start the Gradio server when the container launches.
-CMD ["python", "app.py"]
+# Define the command to run the Streamlit application
+# This will start the Streamlit server when the container launches.
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
