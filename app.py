@@ -50,7 +50,7 @@ if __name__ == "__main__":
     # Launch the Gradio application.
     # share=True is required for environments where localhost is not accessible.
     # The frpc binary required for sharing is now included in the Containerfile.
-    demo.launch(
+    demo.queue().launch(
         server_name="0.0.0.0",
         server_port=7861,
         share=False
