@@ -47,6 +47,11 @@ if __name__ == "__main__":
     )
 
     # Launch the Gradio application
-    # The display options (show_api, show_powered_by, show_settings)
-    # are now controlled within the gr.Blocks constructor in ui.py.
-    demo.launch(share=False, show_api=False)
+    # Set server_name to "0.0.0.0" to bind to all interfaces, making it accessible from outside the container
+    # Set server_port to 7860 to use the standard port
+    demo.launch(
+        server_name="0.0.0.0",
+        server_port=7860,
+        share=False,
+        show_api=False
+    )
