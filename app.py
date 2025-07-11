@@ -9,10 +9,21 @@ from ui import create_gradio_ui
 llm_service = LLMService()
 
 # --- Gradio UI Logic ---
+# app.py
+
 def respond_to_chat(message, history):
-    # ... (this function remains the same)
+    """
+    Main function to handle user messages in the chatbot UI.
+    """
+    # If the user message is empty or None, just return the current state
+    if not message:
+        return "", history
+
     try:
+        # Get response from the LLM service
         ai_response = llm_service.get_chat_response(message)
+
+        # Gradio's 'messages' type for chatbot expects dictionaries
         new_history = history + [
             {"role": "user", "content": message},
             {"role": "assistant", "content": ai_response}
@@ -22,7 +33,8 @@ def respond_to_chat(message, history):
             {"role": "user", "content": message},
             {"role": "assistant", "content": f"Error processing chat: {e}. Please check server logs."}
         ]
-    return "", new_history
+    return "", new_history # Clear input, return updated history
+
 
 # --- Create Gradio App ---
 # Get the initial greeting from the LLM service
