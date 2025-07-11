@@ -34,4 +34,4 @@ EXPOSE 7860
 
 # Define the command to run the Gradio application
 # This will start the Gradio server when the container launches.
-CMD ["uvicorn", "app:demo", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["python", "app.py"]
