@@ -16,6 +16,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+# Download and install the frpc binary for Gradio's share link functionality
+# This is necessary in environments where the container cannot download it at runtime.
+RUN curl -L https://cdn-media.huggingface.co/frpc-gradio-0.2/frpc_linux_amd64 -o /tmp/frpc_linux_amd64 && \
+    mv /tmp/frpc_linux_amd64 /usr/local/lib/python3.9/site-packages/gradio/frpc_linux_amd64_v0.2 && \
+    chmod +x /usr/local/lib/python3.9/site-packages/gradio/frpc_linux_amd64_v0.2
+
 # Copy all application source code into the working directory
 # This includes app.py, config.py, llm_service.py, and ui.py
 COPY app.py .

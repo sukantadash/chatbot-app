@@ -47,14 +47,11 @@ if __name__ == "__main__":
         initial_greeting=initial_greeting
     )
 
-    # Launch the Gradio application
-    # Set server_name to "0.0.0.0" to bind to all interfaces
-    # Use inbrowser=False to prevent localhost accessibility check
+    # Launch the Gradio application.
+    # share=True is required for environments where localhost is not accessible.
+    # The frpc binary required for sharing is now included in the Containerfile.
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
-        share=False,
-        show_api=False,
-        prevent_thread_lock=True,
-        inbrowser=False  # Prevents localhost check by not trying to open browser
+        share=True
     )
