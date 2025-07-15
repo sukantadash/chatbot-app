@@ -1,5 +1,7 @@
 # llm_service.py - LLM Interaction Service
 
+import os
+import httpx
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -16,11 +18,22 @@ class LLMService:
         """
         Initializes the LLM and the main conversation chain.
         """
+        # --- Configure custom httpx client for SSL verification ---
+        # Get the CA bundle path from the environment variable
+        ca_bundle_path = os.getenv("REQUESTS_CA_BUNDLE")
+
+        # Create an httpx client with custom SSL verification
+        # If REQUESTS_CA_BUNDLE is not set, httpx will use its default verification.
+        http_client = httpx.Client(
+            verify=ca_bundle_path if ca_bundle_path else True
+        )
+
         self.llm = ChatOpenAI(
             model_name=AppConfig.VLLM_MODEL_NAME,
             openai_api_base=AppConfig.VLLM_API_URL,
             openai_api_key=AppConfig.VLLM_API_KEY,
-            temperature=AppConfig.DEFAULT_TEMPERATURE
+            temperature=AppConfig.DEFAULT_TEMPERATURE,
+            http_client=http_client
         )
         
         # Create a prompt template that includes message history

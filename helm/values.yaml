@@ -44,3 +44,8 @@ resources:
 
 # Labels to apply to all resources created by this chart
 commonLabels: {}
+
+customCA:
+  enabled: true
+  certFilePath: "files/my-ca.crt"
+  envVarName: "REQUESTS_CA_BUNDLE"

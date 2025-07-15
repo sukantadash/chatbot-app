@@ -1,0 +1,11 @@
+{{- if and .Values.customCA.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "chatbot-app-chart.fullname" . }}-ca
+  labels:
+    {{- include "chatbot-app-chart.labels" . | nindent 4 }}
+data:
+  ca.crt: |-
+    {{ .Files.Get .Values.customCA.certFilePath | nindent 4 }}
+{{- end }}

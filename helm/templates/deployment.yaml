@@ -33,9 +33,24 @@ spec:
                 secretKeyRef:
                   name: {{ include "chatbot-app-chart.fullname" . }}-secret
                   key: VLLM_API_KEY
+          {{- if and .Values.customCA.enabled}}
+            - name: {{ .Values.customCA.envVarName }}
+              value: /etc/ssl/certs/custom-ca.crt
+          {{- end }}
+          {{- if and .Values.customCA.enabled }}
+          volumeMounts:
+            - name: custom-ca-volume
+              mountPath: /etc/ssl/certs/custom-ca.crt
+              subPath: ca.crt
+              readOnly: true
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       restartPolicy: Always
+      volumes:
+        - name: custom-ca-volume
+          configMap:
+            name: {{ include "chatbot-app-chart.fullname" . }}-ca
   strategy:
     type: RollingUpdate
     rollingUpdate:
